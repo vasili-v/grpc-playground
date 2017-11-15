@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package stream;
+
+service Stream {
+  rpc New(stream Message) returns (stream Message) {}
+}
+
+message Message {
+  bytes payload = 2;
+}
