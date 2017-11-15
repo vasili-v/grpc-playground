@@ -22,25 +22,26 @@ type server struct{}
 
 func (s *server) New(stream pb.Stream_NewServer) error {
 	log.Printf("got new stream")
-	for {
+	i := 0
+	for ; perStreamLimit <= 0 || i < perStreamLimit; i++ {
 		in, err := stream.Recv()
 		if err == io.EOF {
 			break
 		}
 
 		if err != nil {
-			log.Printf("coudn't receive message: %s", err)
+			log.Printf("coudn't receive %d message: %s", i, err)
 			return err
 		}
 
 		err = stream.Send(handler(in))
 		if err != nil {
-			log.Printf("coudn't send message: %s", err)
+			log.Printf("coudn't send %d message: %s", i, err)
 			return err
 		}
 	}
 
-	log.Printf("stream depleted")
+	log.Printf("stream depleted, %d messages processed", i)
 	return nil
 }
 
